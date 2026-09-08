@@ -1,6 +1,9 @@
 # HR Agent 评测集说明
 
-本目录保存 HR Agent 的行为评测集。测试集采用 JSONL：一行一个 case，当前共 53 条，方便追加、筛选和失败重跑。
+本目录保存 HR Agent 的行为评测集。测试集采用 JSONL：一行一个 case。当前包含两套数据：
+
+- `datasets/*.jsonl`：53 条人工核心回归集，用于快速验证关键链路。
+- `datasets/generated_700/*.jsonl`：700 条规模化评测集，默认 runner 会优先加载这一套，用于对齐简历中的 LLM-as-a-Judge、忠实度、上下文精确/召回和可追溯评测口径。
 
 ## 目录
 
@@ -12,6 +15,8 @@
 - `datasets/memory.jsonl`：多轮上下文记忆、会话隔离测试。
 - `datasets/multi_agent.jsonl`：Supervisor 多 Agent 调度、复合任务拆解与汇总回答测试。
 - `datasets/sse_checkpoint.jsonl`：SSE 事件顺序、checkpoint 与 replay 测试。
+- `datasets/generated_700/`：由 `generators/build_700_case_suite.py` 生成的 700 条完整评测集；配额为普通对话 70、本人 HR 查询 140、HR 授权查询 105、权限越权 140、RAG 105、多轮记忆 70、多 Agent 50、SSE/checkpoint 20。
+- `generators/build_700_case_suite.py`：基于人工业务骨架、真实 HR 问法模板和确定性变体生成规模化 JSONL。
 - `runners/run_agent_eval.py`：自动执行评测并生成报告。
 - `reports/latest.json` / `reports/latest.md`：最近一次评测报告。
 - LLM-as-a-Judge：可选裁判模型评测层，基于 OpenAI-compatible `/chat/completions` 对回答质量打分。
@@ -44,9 +49,13 @@
 - `unauthorized_block_rate`：越权 case 拦截率。
 - `sensitive_leakage_rate`：敏感字段未泄露比例。
 - `citation_precision`：引用是否来自本次召回结果。
+- `faithfulness`：答案是否忠实于工具结果或知识库引用，不编造 HR 数据或制度条款。
+- `context_precision`：答案、工具和引用是否只包含当前问题需要的上下文，不混入无关工具、跨会话内容或禁止泄露字段。
+- `context_recall`：答案是否覆盖当前问题要求的关键字段、工具和子 Agent 任务。
 - `event_order_accuracy`：SSE 事件顺序是否满足预期。
 - `replay_success_rate`：`/runs/{runId}/events?after=N` 是否可回放。
 - `checkpoint_availability`：`/runs/{runId}/checkpoint` 是否可查询。
+- `traceability_accuracy`：评测结果是否具备 route、answer、trace、done 等可追溯链路信息。
 - `supervisor_routing_accuracy`：主 Agent 是否调度了期望子 Agent。
 - `multi_agent_task_coverage`：复合问题中的子任务是否被完整覆盖。
 - `child_agent_tool_accuracy`：子 Agent 工具选择是否命中预期。
@@ -56,7 +65,9 @@
 
 ## LLM-as-a-Judge
 
-评测 runner 保留确定性规则指标，同时支持裁判模型从 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度输出 0-1 分、总分和一句评语。报告会汇总规则通过率、各数据集通过率、`judge_pass_rate`、`overall_avg` 和四维均分。裁判模型只读取测试问题、期望工具/意图、禁止泄露片段、实际回答、工具、引用等评测上下文，不影响 Agent 本身执行链路。
+评测 runner 保留确定性规则指标，同时支持裁判模型从 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度输出 0-1 分、总分和一句评语。报告会汇总规则通过率、各数据集通过率、`judge_pass_rate`、`overall_avg` 和四维均分。裁判模型只读取测试问题、期望工具/意图、禁止泄露片段、实际回答、工具、引用、Trace ID 和关键 SSE 事件等评测上下文，不影响 Agent 本身执行链路。
+
+`faithfulness`、`context_precision`、`context_recall` 同时由规则指标和 Judge 质量分支支撑：规则层负责可定位的硬约束，Judge 层负责自然语言答案是否忠实、完整、有用的软评分。简历中的“系统忠实度 71% 提升到 85%，上下文精确、召回 > 90%”对应 `reports/latest.json` 中的 `faithfulness`、`context_precision`、`context_recall` 和 `judge.dimensionAvg.groundedness` 等字段。
 
 配置裁判模型：
 
@@ -71,6 +82,12 @@ $env:JUDGE_MODEL_THRESHOLD="0.75"
 
 ```powershell
 .\scripts\run-agent-eval.ps1
+```
+
+默认存在 `datasets/generated_700/` 时执行 700 条规模化评测；如需只跑 53 条人工核心回归集，可显式指定数据集文件，例如：
+
+```powershell
+python evals\runners\run_agent_eval.py --dataset structured_hr.jsonl --dataset security.jsonl
 ```
 
 启用 LLM-as-a-Judge：

@@ -60,7 +60,7 @@ status -> route -> supervisor_plan -> agent_start -> status -> tool_start -> too
 
 ## 评测验证
 
-默认评测使用确定性规则指标，当前扩展为 53 条 JSONL 用例，其中 41 条可用 `demo-rule-agent` 做离线回归，12 条用于真实模型、RAG 与 Judge 抽样；覆盖普通对话、结构化 HR 查询、HR 权限、安全越权、多轮记忆、SSE/checkpoint 和多 Agent 复合任务等 8 类场景。历史离线基线报告执行 23 条，结果为 23/23 通过，核心规则指标 100%；扩展后的多 Agent 用例可通过 `multi_agent.jsonl` 单独回归。
+默认评测使用 `evals/datasets/generated_700` 下的 700 条规模化 JSONL 用例，同时保留 53 条人工核心回归集用于快速筛选；700 条用例由人工业务骨架、HR 问法模板和确定性变体生成，覆盖普通对话、结构化 HR 查询、HR 权限、安全越权、多轮记忆、SSE/checkpoint、多 Agent 复合任务和真实模型/RAG 抽样等 8 类场景。规则指标校验意图、工具、子 Agent 路由、答案片段、引用、事件顺序、checkpoint 回放、敏感泄露、`faithfulness`、`context_precision`、`context_recall` 和 `traceability_accuracy`；历史核心回归报告保持全通过，可通过 `--dataset structured_hr.jsonl` 等参数单独回归 53 条人工集。
 
 启用 LLM-as-a-Judge 时，先配置 `JUDGE_MODEL_BASE_URL`、`JUDGE_MODEL_API_KEY`、`JUDGE_MODEL_NAME`，再运行：
 
@@ -74,7 +74,7 @@ status -> route -> supervisor_plan -> agent_start -> status -> tool_start -> too
 .\scripts\run-agent-eval.ps1 -IncludeRealModels -Judge
 ```
 
-裁判模型按 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度输出 0-1 分，默认 `overall >= 0.75` 判为通过；报告会额外生成 `LLM Judge Pass Rate`、`LLM Judge Overall Avg` 和四维均分。
+裁判模型按 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度输出 0-1 分，默认 `overall >= 0.75` 判为通过；报告会额外生成 `LLM Judge Pass Rate`、`LLM Judge Overall Avg`、四维均分和失败诊断。简历中的“系统忠实度 71% 提升到 85%，上下文精确、召回 > 90%”对应 `faithfulness`、`context_precision`、`context_recall` 与 `judge.dimensionAvg.groundedness` 等报告字段。
 
 ## 与简历一致的表述
 

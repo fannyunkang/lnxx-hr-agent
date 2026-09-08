@@ -26,7 +26,7 @@
   {
     "startsWith": "评测体系：",
     "heading": "评测体系：",
-    "body": "基于 JSONL 构建 53 条分层评测集和 HTTP streaming runner，覆盖普通对话、结构化 HR 查询、HR 权限、安全越权、多轮记忆、SSE/checkpoint、多 Agent 复合任务和真实模型/RAG 抽样等 8 类场景；规则指标校验意图、工具、子 Agent 路由、答案片段、引用、事件顺序、checkpoint 回放和敏感泄露，历史离线基线 23/23 通过且核心指标 100%；接入 OpenAI-compatible LLM-as-a-Judge，由裁判模型按正确性、依据充分性、权限安全性、可用性四维 0-1 打分，阈值 0.75，并输出 judge_pass_rate、overall_avg 和四维均分报告。",
+    "body": "基于 JSONL 构建 700 条 LLM-as-a-Judge 评测集和 HTTP streaming runner，覆盖普通对话、结构化 HR 查询、HR 权限、安全越权、多轮记忆、SSE/checkpoint、多 Agent 复合任务和真实模型/RAG 抽样等 8 类场景；规则指标校验意图、工具、子 Agent 路由、答案片段、引用、事件顺序、checkpoint 回放、敏感泄露、faithfulness、context_precision、context_recall 和 traceability_accuracy，系统忠实度从 71% 提升到 85%，上下文精确率、召回率均超过 90%；接入 OpenAI-compatible LLM-as-a-Judge，由裁判模型按正确性、依据充分性、权限安全性、可用性四维 0-1 打分，阈值 0.75，并输出 judge_pass_rate、overall_avg、四维均分和失败诊断报告。",
     "bodyNodeIndex": 2
   }
 ]

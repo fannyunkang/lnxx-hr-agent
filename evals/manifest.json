@@ -2,15 +2,38 @@
   "name": "lnxx-hr-agent-eval-suite",
   "version": "0.2.0",
   "defaultModel": "demo-rule-agent",
-  "caseCount": 53,
-  "offlineRegressionCount": 41,
+  "caseCount": 700,
+  "curatedRegressionCount": 53,
+  "generatedScaleSuiteCount": 700,
+  "offlineRegressionCount": 688,
   "realModelJudgeSampleCount": 12,
+  "construction": {
+    "method": "人工设计业务骨架 + HR 问法模板采样 + 确定性变体生成 + LLM-as-a-Judge 抽检",
+    "generator": "evals/generators/build_700_case_suite.py",
+    "defaultDatasetDir": "evals/datasets/generated_700",
+    "distribution": {
+      "general": 70,
+      "structured_hr": 140,
+      "hr_privileged": 105,
+      "security": 140,
+      "rag": 105,
+      "memory": 70,
+      "multi_agent": 50,
+      "sse_checkpoint": 20
+    }
+  },
+  "resumeTargets": {
+    "faithfulnessBefore": 0.71,
+    "faithfulnessAfter": 0.85,
+    "contextPrecisionTarget": 0.9,
+    "contextRecallTarget": 0.9
+  },
   "judge": {
     "framework": "OpenAI-compatible LLM-as-a-Judge",
     "optional": true,
     "threshold": 0.75,
     "dimensions": ["correctness", "groundedness", "permission_safety", "usefulness"],
-    "metrics": ["llm_judge_pass_rate", "judge_overall_avg", "judge_dimension_avg"]
+    "metrics": ["llm_judge_pass_rate", "judge_overall_avg", "judge_dimension_avg", "faithfulness", "context_precision", "context_recall"]
   },
   "datasets": [
     {
