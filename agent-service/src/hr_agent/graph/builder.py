@@ -11,7 +11,7 @@ from hr_agent.api.schemas import AgentRunRequest, AgentRunResponse, UserContext
 from hr_agent.config import Settings
 from hr_agent.conversation import ConversationStore
 from hr_agent.graph.multi_agent import ChildAgentSpec, load_child_agent_plugins, plan_child_agents
-from hr_agent.graph.router import classify_intent
+from hr_agent.graph.router import preclassify_intent
 from hr_agent.model_client import (
     ModelClient,
     ModelClientError,
@@ -112,10 +112,28 @@ class HrAgentGraph:
 
                 route_span = trace.span("route")
                 yield await self._emit(request.request_id, "status", {"stage": "ROUTING", "message": "正在识别意图"})
-                routed_intent, routed_tool = classify_intent(request.message)
+                classification = preclassify_intent(request.message)
+                routed_intent = classification.intent
+                routed_tool = classification.selected_tool
                 trace.intent = routed_intent
-                route_span.finish(intent=routed_intent, selected_tool=routed_tool)
-                yield await self._emit(request.request_id, "route", {"intent": routed_intent, "selectedTool": routed_tool})
+                route_span.finish(
+                    intent=routed_intent,
+                    selected_tool=routed_tool,
+                    access_scope=classification.access_scope,
+                    risk_level=classification.risk_level,
+                    target_hints=classification.target_hints,
+                )
+                yield await self._emit(
+                    request.request_id,
+                    "route",
+                    {
+                        "intent": routed_intent,
+                        "selectedTool": routed_tool,
+                        "accessScope": classification.access_scope,
+                        "riskLevel": classification.risk_level,
+                        "targetHints": classification.target_hints,
+                    },
+                )
 
                 plan_span = trace.span("supervisor_plan")
                 child_agents = plan_child_agents(request.message, routed_intent, self._child_agents)

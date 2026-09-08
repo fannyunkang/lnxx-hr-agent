@@ -74,6 +74,9 @@ async def test_graph_emits_route_and_queryable_node_trace():
     events = [event async for event in graph.events(request)]
     names = [event.name for event in events]
     assert names.index("status") < names.index("route") < names.index("tool_start")
+    route_event = next(event for event in events if event.name == "route")
+    assert route_event.data["accessScope"] == "SELF_OR_UNSPECIFIED"
+    assert route_event.data["riskLevel"] == "LOW"
     trace_event = next(event for event in events if event.name == "trace")
     trace = await graph.trace(trace_event.data["trace_id"])
     assert trace is not None

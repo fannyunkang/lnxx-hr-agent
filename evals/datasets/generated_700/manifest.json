@@ -1,0 +1,15 @@
+{
+  "caseCount": 700,
+  "generatedBy": "evals/generators/build_700_case_suite.py",
+  "datasets": {
+    "general.jsonl": 70,
+    "structured_hr.jsonl": 140,
+    "hr_privileged.jsonl": 105,
+    "security.jsonl": 140,
+    "rag.jsonl": 105,
+    "memory.jsonl": 70,
+    "multi_agent.jsonl": 50,
+    "sse_checkpoint.jsonl": 20
+  },
+  "construction": "人工设计业务骨架 + 真实 HR 问法模板 + 确定性变体生成 + LLM-as-a-Judge 质量评测"
+}
