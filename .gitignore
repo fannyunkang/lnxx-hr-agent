@@ -1,0 +1,17 @@
+.idea/
+.vscode/
+*.iml
+.DS_Store
+.env
+scripts/model-api.local.ps1
+.tools/
+agent-service/.venv/
+agent-service/.pytest_cache/
+agent-service/.ruff_cache/
+agent-service/**/__pycache__/
+backend/target/
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+data/
+backend/data/

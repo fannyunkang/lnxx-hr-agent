@@ -1,0 +1,98 @@
+spring:
+  application:
+    name: lnxx-hr-agent
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./data/hr-agent;MODE=MySQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/common
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 1s
+  ai:
+    openai:
+      base-url: ${CHAT_MODEL_BASE_URL:https://api.deepseek.com}
+      api-key: ${CHAT_MODEL_API_KEY:replace-with-your-api-key}
+      chat:
+        options:
+          model: ${CHAT_MODEL_NAME:deepseek-chat}
+          temperature: 0.2
+      embedding:
+        base-url: ${EMBEDDING_MODEL_BASE_URL:${CHAT_MODEL_BASE_URL:https://api.openai.com}}
+        api-key: ${EMBEDDING_MODEL_API_KEY:${CHAT_MODEL_API_KEY:replace-with-your-api-key}}
+        options:
+          model: ${EMBEDDING_MODEL_NAME:text-embedding-3-small}
+    retry:
+      max-attempts: 3
+      backoff:
+        initial-interval: 500ms
+        multiplier: 2
+        max-interval: 2s
+    mcp:
+      client:
+        enabled: ${MCP_CLIENT_ENABLED:false}
+    vectorstore:
+      milvus:
+        client:
+          host: ${MILVUS_HOST:localhost}
+          port: ${MILVUS_PORT:19530}
+        database-name: ${MILVUS_DATABASE:default}
+        collection-name: ${MILVUS_COLLECTION:hr_knowledge_v1}
+        embedding-dimension: ${EMBEDDING_DIMENSION:1536}
+        initialize-schema: ${MILVUS_INITIALIZE_SCHEMA:false}
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    arg-name-based-constructor-auto-mapping: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+hr-agent:
+  runtime: ${AGENT_RUNTIME:spring-ai}
+  security:
+    token-secret: ${HR_AGENT_TOKEN_SECRET:lnxx-hr-agent-local-demo-secret}
+    token-validity-seconds: 28800
+  cors:
+    allowed-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  agent:
+    base-url: ${AGENT_BASE_URL:http://localhost:8000}
+    service-token: ${AGENT_SERVICE_TOKEN:change-this-in-production}
+    timeout-seconds: ${AGENT_TIMEOUT_SECONDS:30}
+    models: ${AGENT_MODELS:${CHAT_MODEL_NAME:deepseek-chat},qwen-plus,qwen-max,doubao-pro-32k,doubao-lite-32k,demo-rule-agent}
+  memory:
+    max-messages: ${CONVERSATION_MAX_MESSAGES:20}
+    ttl: ${CONVERSATION_TTL:PT24H}
+  ingestion:
+    chunk-size: ${INGESTION_CHUNK_SIZE:500}
+    chunk-overlap: ${INGESTION_CHUNK_OVERLAP:80}
+  ocr:
+    base-url: ${OCR_SERVICE_URL:${OCR_SERVICE_BASE_URL:http://localhost:8866}}
+  reranker:
+    enabled: ${RERANKER_ENABLED:false}
+    base-url: ${RERANKER_BASE_URL:}
+    api-key: ${RERANKER_API_KEY:}
+    model: ${RERANKER_MODEL:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    com.lnxx.hr: INFO

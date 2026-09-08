@@ -1,0 +1,1 @@
+"""LNXX HR Agent service."""

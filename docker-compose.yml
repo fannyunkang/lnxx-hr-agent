@@ -1,0 +1,159 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hr_agent
+      MYSQL_USER: hr_agent
+      MYSQL_PASSWORD: hr_agent
+    ports: ["3306:3306"]
+    volumes: ["mysql-data:/var/lib/mysql"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uhr_agent", "-phr_agent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7.4-alpine
+    ports: ["6379:6379"]
+    volumes: ["redis-data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.18
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    command: etcd --advertise-client-urls=http://etcd:2379 --listen-client-urls=http://0.0.0.0:2379 --data-dir=/etcd
+    volumes: ["etcd-data:/etcd"]
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: minio server /minio_data --console-address :9001
+    ports: ["9001:9001"]
+    volumes: ["minio-data:/minio_data"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  milvus:
+    image: milvusdb/milvus:v2.5.8
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    ports: ["19530:19530", "9091:9091"]
+    volumes: ["milvus-data:/var/lib/milvus"]
+    depends_on:
+      etcd: { condition: service_healthy }
+      minio: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  ocr:
+    build: ./ocr-service
+    ports: ["8866:8866"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8866/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  mcp-server:
+    build:
+      context: .
+      dockerfile: hr-mcp-server/Dockerfile
+    environment:
+      MYSQL_URL: jdbc:mysql://mysql:3306/hr_agent?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      MYSQL_USERNAME: hr_agent
+      MYSQL_PASSWORD: hr_agent
+    ports: ["8090:8090"]
+    depends_on:
+      mysql: { condition: service_healthy }
+
+  agent-service:
+    build: ./agent-service
+    environment:
+      HR_AGENT_BACKEND_BASE_URL: http://backend:8080
+      HR_AGENT_TOOL_TRANSPORT: mcp
+      HR_AGENT_MCP_BASE_URL: http://mcp-server:8090
+      HR_AGENT_MCP_ENDPOINT: /mcp
+      HR_AGENT_SERVICE_TOKEN: ${AGENT_SERVICE_TOKEN:-change-this-in-production}
+      HR_AGENT_MODEL_BASE_URL: ${CHAT_MODEL_BASE_URL:-}
+      HR_AGENT_MODEL_API_KEY: ${CHAT_MODEL_API_KEY:-}
+      HR_AGENT_MODEL_NAME: ${CHAT_MODEL_NAME:-}
+      HR_AGENT_MODEL_OPTIONS: ${AGENT_MODELS:-deepseek-chat,qwen-plus,qwen-max,doubao-pro-32k,doubao-lite-32k,demo-rule-agent}
+      HR_AGENT_REDIS_URL: redis://redis:6379/0
+      HR_AGENT_REDIS_ENABLED: "true"
+      HR_AGENT_CONVERSATION_TTL_SECONDS: 86400
+      HR_AGENT_MAX_TOOLS_PER_TURN: 5
+      HR_AGENT_MAX_TOTAL_TOOL_CALLS: 5
+      HR_AGENT_RUN_TIMEOUT_SECONDS: 30
+    ports: ["8000:8000"]
+    depends_on:
+      redis: { condition: service_healthy }
+      mcp-server: { condition: service_started }
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      AGENT_RUNTIME: python
+      AGENT_BASE_URL: http://agent-service:8000
+      AGENT_SERVICE_TOKEN: ${AGENT_SERVICE_TOKEN:-change-this-in-production}
+      AGENT_MODELS: ${AGENT_MODELS:-deepseek-chat,qwen-plus,qwen-max,doubao-pro-32k,doubao-lite-32k,demo-rule-agent}
+      DB_URL: jdbc:mysql://mysql:3306/hr_agent?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      DB_USERNAME: hr_agent
+      DB_PASSWORD: hr_agent
+      REDIS_HOST: redis
+      MILVUS_HOST: milvus
+      MCP_SERVER_URL: http://mcp-server:8090
+      OCR_SERVICE_URL: http://ocr:8866
+    ports: ["8080:8080"]
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      milvus: { condition: service_healthy }
+      ocr: { condition: service_healthy }
+      mcp-server: { condition: service_started }
+      agent-service: { condition: service_started }
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  frontend:
+    build: ./frontend
+    ports: ["5173:80"]
+    depends_on:
+      backend: { condition: service_healthy }
+
+volumes:
+  mysql-data:
+  redis-data:
+  etcd-data:
+  minio-data:
+  milvus-data:

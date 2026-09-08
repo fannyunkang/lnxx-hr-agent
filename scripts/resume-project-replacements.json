@@ -1,0 +1,32 @@
+[
+  {
+    "startsWith": "项目简介：围绕企业人力资源场景",
+    "heading": "项目简介：",
+    "body": "围绕企业人力资源场景，搭建 Vue + Java Spring Boot + Python 多 Agent + MCP + Redis + MySQL/Milvus 的人力知识 Agent 平台，支持员工档案、考勤、年假、审批进度、HR 员工搜索和制度问答 6 类场景；Java 后端负责登录鉴权、权限判断和业务数据，Python Supervisor Agent 负责任务拆解、子 Agent 调度、SSE 流式返回和 Trace 追踪。",
+    "bodyNodeIndex": 1
+  },
+  {
+    "startsWith": "Agent 编排与 MCP 工具链：",
+    "heading": "插件化 Agent 编排与 MCP 工具链：",
+    "body": "借鉴 DeepSeek Harness “Everything is a plugin” 思路，把模型适配、MCP 工具、子 Agent、会话/Trace 存储和评测器拆成可替换模块；通过 agent_plugins.json 挂载档案、考勤、年假、审批、制度问答和员工搜索 6 个 HR 子 Agent，主 Agent 负责规划与汇总，子 Agent 只暴露自己的工具白名单并执行 model→tools→model 循环，支持复合问题并行调度；工具统一通过独立 Java MCP Server 调用，并限制单轮最多 5 个工具、单次最多 5 次工具调用、最多 5 轮循环。",
+    "bodyNodeIndex": 4
+  },
+  {
+    "startsWith": "模型接入与权限控制：",
+    "heading": "模型接入与权限控制：",
+    "body": "封装 OpenAI-compatible LlmClient，统一接入 DeepSeek、Qwen、Doubao 等模型，并保留 demo-rule-agent 用于稳定演示；用户身份、员工编号、角色、部门都由服务端注入，模型不能自己填写或修改，配合 Pydantic、Bean Validation 和工具参数 Schema 拦截越权调用；会话按 username:conversationId 隔离，保留最近 20 条消息，设置 24h 过期时间，并支持 SSE 事件回放和 checkpoint 查询。",
+    "bodyNodeIndex": 1
+  },
+  {
+    "startsWith": "RAG 与可观测性：",
+    "heading": "RAG 与可观测性：",
+    "body": "实现 PDF、Markdown、JSON 制度文档上传入库，普通 PDF 用 PDFBox 解析，扫描件文本不足时自动走 OCR；文档按语义边界切成 chunk，并支持版本化入库和软删除；检索前先按 PUBLIC、DEPARTMENT、PERSONAL、HR_ONLY 做权限过滤，再由 MySQL 关键词检索和 Milvus 向量检索各取 Top 30，使用 RRF 融合返回 Top 5，并生成 [KB-{documentId}-{version}-{chunkNumber}] 引用；Trace 记录主 Agent 规划、子 Agent 调度、模型轮次、工具耗时、状态和异常码。",
+    "bodyNodeIndex": 1
+  },
+  {
+    "startsWith": "评测体系：",
+    "heading": "评测体系：",
+    "body": "基于 JSONL 构建 53 条分层评测集和 HTTP streaming runner，覆盖普通对话、结构化 HR 查询、HR 权限、安全越权、多轮记忆、SSE/checkpoint、多 Agent 复合任务和真实模型/RAG 抽样等 8 类场景；规则指标校验意图、工具、子 Agent 路由、答案片段、引用、事件顺序、checkpoint 回放和敏感泄露，历史离线基线 23/23 通过且核心指标 100%；接入 OpenAI-compatible LLM-as-a-Judge，由裁判模型按正确性、依据充分性、权限安全性、可用性四维 0-1 打分，阈值 0.75，并输出 judge_pass_rate、overall_avg 和四维均分报告。",
+    "bodyNodeIndex": 2
+  }
+]

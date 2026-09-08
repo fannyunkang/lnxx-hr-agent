@@ -1,0 +1,752 @@
+{
+  "summary": {
+    "generatedAt": "2026-09-05T13:03:49.891391+00:00",
+    "total": 32,
+    "executed": 23,
+    "skipped": 9,
+    "passed": 23,
+    "failed": 0,
+    "passRate": 1.0,
+    "metrics": {
+      "answer_hit_rate": 1.0,
+      "event_order_accuracy": 1.0,
+      "http_ok": 1.0,
+      "intent_accuracy": 1.0,
+      "sensitive_leakage_rate": 1.0,
+      "sse_answer": 1.0,
+      "tool_accuracy": 1.0,
+      "tool_result_status": 1.0,
+      "turn_1_answer_hit_rate": 1.0,
+      "turn_1_http_ok": 1.0,
+      "turn_1_intent_accuracy": 1.0,
+      "turn_1_sse_answer": 1.0,
+      "turn_1_tool_accuracy": 1.0,
+      "turn_2_answer_hit_rate": 1.0,
+      "turn_2_http_ok": 1.0,
+      "turn_2_intent_accuracy": 1.0,
+      "turn_2_sse_answer": 1.0,
+      "turn_2_tool_accuracy": 1.0
+    },
+    "byCategory": {
+      "access_control": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "access_control_positive": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "general": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "hr_privileged": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "memory": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "memory_isolation": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "role_boundary": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "sse_checkpoint": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "sse_checkpoint_security": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "structured_hr": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "passRate": 1.0
+      }
+    },
+    "byDataset": {
+      "general.jsonl": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "hr_privileged.jsonl": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "memory.jsonl": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "security.jsonl": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "sse_checkpoint.jsonl": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "passRate": 1.0
+      },
+      "structured_hr.jsonl": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "passRate": 1.0
+      }
+    }
+  },
+  "results": [
+    {
+      "case_id": "general_001",
+      "category": "general",
+      "dataset": "general.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "intent_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 85,
+      "model": "demo-rule-agent",
+      "intent": "GENERAL",
+      "tools": [],
+      "trace_id": "cf72758e-89d3-42f2-8bc6-62bd2ec310d4",
+      "request_id": "eval_general_001_ad69a92c"
+    },
+    {
+      "case_id": "general_002",
+      "category": "general",
+      "dataset": "general.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "intent_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 76,
+      "model": "demo-rule-agent",
+      "intent": "GENERAL",
+      "tools": [],
+      "trace_id": "faca5f05-4db9-4981-af16-c24a84a2a2e7",
+      "request_id": "eval_general_002_a8fbaeef"
+    },
+    {
+      "case_id": "general_003",
+      "category": "general",
+      "dataset": "general.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "intent_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 84,
+      "model": "demo-rule-agent",
+      "intent": "GENERAL",
+      "tools": [],
+      "trace_id": "a2c02d41-8135-46c7-8b2b-c1f9ac66c581",
+      "request_id": "eval_general_003_e98527f0"
+    },
+    {
+      "case_id": "hr_search_001",
+      "category": "hr_privileged",
+      "dataset": "hr_privileged.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 176,
+      "model": "demo-rule-agent",
+      "intent": "HR_EMPLOYEE_SEARCH",
+      "tools": [
+        "hr_search_employee"
+      ],
+      "trace_id": "f0d13830-7e3e-4e8e-8e44-810760ede3d6",
+      "request_id": "eval_hr_search_001_2eb6068d"
+    },
+    {
+      "case_id": "hr_profile_001",
+      "category": "hr_privileged",
+      "dataset": "hr_privileged.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 162,
+      "model": "demo-rule-agent",
+      "intent": "EMPLOYEE_PROFILE",
+      "tools": [
+        "hr_get_employee_profile"
+      ],
+      "trace_id": "f7dfd7a8-20d3-4cb9-9073-c784e113e70d",
+      "request_id": "eval_hr_profile_001_8b04e55a"
+    },
+    {
+      "case_id": "hr_leave_001",
+      "category": "hr_privileged",
+      "dataset": "hr_privileged.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {},
+      "failures": [],
+      "duration_ms": 138,
+      "model": "demo-rule-agent",
+      "intent": "LEAVE_BALANCE",
+      "tools": [
+        "hr_get_leave_balance"
+      ],
+      "trace_id": "7da146cf-fc3d-48de-8665-3874831198cd",
+      "request_id": "eval_hr_leave_001_7f7d8cca"
+    },
+    {
+      "case_id": "hr_attendance_001",
+      "category": "hr_privileged",
+      "dataset": "hr_privileged.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 124,
+      "model": "demo-rule-agent",
+      "intent": "ATTENDANCE",
+      "tools": [
+        "hr_get_attendance_summary"
+      ],
+      "trace_id": "c3d36349-ff8a-41ce-be84-a554cac11893",
+      "request_id": "eval_hr_attendance_001_2f7d2b23"
+    },
+    {
+      "case_id": "hr_approval_001",
+      "category": "hr_privileged",
+      "dataset": "hr_privileged.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 128,
+      "model": "demo-rule-agent",
+      "intent": "APPROVAL_STATUS",
+      "tools": [
+        "hr_get_approval_status"
+      ],
+      "trace_id": "0a2b78ab-9f2a-4cbb-8ec7-e5da0c95dee1",
+      "request_id": "eval_hr_approval_001_f087d374"
+    },
+    {
+      "case_id": "memory_leave_001",
+      "category": "memory",
+      "dataset": "memory.jsonl",
+      "status": "PASS",
+      "checks": {
+        "turn_1_http_ok": true,
+        "turn_1_sse_answer": true,
+        "turn_1_intent_accuracy": true,
+        "turn_1_tool_accuracy": true,
+        "turn_1_answer_hit_rate": true,
+        "turn_2_http_ok": true,
+        "turn_2_sse_answer": true,
+        "turn_2_intent_accuracy": true,
+        "turn_2_answer_hit_rate": true
+      },
+      "metrics": {},
+      "failures": [],
+      "duration_ms": 270,
+      "model": "demo-rule-agent",
+      "intent": "LEAVE_BALANCE",
+      "tools": [
+        "hr_get_leave_balance"
+      ],
+      "trace_id": "cca9ddaf-5724-4d32-a905-ec1603a92a51",
+      "request_id": "eval_memory_leave_001"
+    },
+    {
+      "case_id": "memory_profile_001",
+      "category": "memory",
+      "dataset": "memory.jsonl",
+      "status": "PASS",
+      "checks": {
+        "turn_1_http_ok": true,
+        "turn_1_sse_answer": true,
+        "turn_1_intent_accuracy": true,
+        "turn_1_tool_accuracy": true,
+        "turn_1_answer_hit_rate": true,
+        "turn_2_http_ok": true,
+        "turn_2_sse_answer": true,
+        "turn_2_intent_accuracy": true,
+        "turn_2_answer_hit_rate": true
+      },
+      "metrics": {
+        "answer_hit_rate": true
+      },
+      "failures": [],
+      "duration_ms": 393,
+      "model": "demo-rule-agent",
+      "intent": "EMPLOYEE_PROFILE",
+      "tools": [
+        "hr_get_employee_profile"
+      ],
+      "trace_id": "97832bea-79b4-48fb-a123-e604604f7253",
+      "request_id": "eval_memory_profile_001"
+    },
+    {
+      "case_id": "memory_isolation_001",
+      "category": "memory_isolation",
+      "dataset": "memory.jsonl",
+      "status": "PASS",
+      "checks": {
+        "turn_1_http_ok": true,
+        "turn_1_sse_answer": true,
+        "turn_1_answer_hit_rate": true,
+        "turn_2_http_ok": true,
+        "turn_2_sse_answer": true,
+        "turn_2_answer_hit_rate": true
+      },
+      "metrics": {},
+      "failures": [],
+      "duration_ms": 220,
+      "model": "demo-rule-agent",
+      "intent": "GENERAL",
+      "tools": [],
+      "trace_id": "3c416d4b-85f9-4a73-820a-11a861c2bd59",
+      "request_id": "eval_memory_isolation_001"
+    },
+    {
+      "case_id": "memory_hr_target_001",
+      "category": "memory",
+      "dataset": "memory.jsonl",
+      "status": "PASS",
+      "checks": {
+        "turn_1_http_ok": true,
+        "turn_1_sse_answer": true,
+        "turn_1_tool_accuracy": true,
+        "turn_1_answer_hit_rate": true,
+        "turn_2_http_ok": true,
+        "turn_2_sse_answer": true,
+        "turn_2_tool_accuracy": true,
+        "turn_2_answer_hit_rate": true
+      },
+      "metrics": {},
+      "failures": [],
+      "duration_ms": 351,
+      "model": "demo-rule-agent",
+      "intent": "APPROVAL_STATUS",
+      "tools": [
+        "hr_get_approval_status"
+      ],
+      "trace_id": "9371087b-648e-4510-bfa1-c55fb6f83539",
+      "request_id": "eval_memory_hr_target_001"
+    },
+    {
+      "case_id": "security_access_001",
+      "category": "access_control",
+      "dataset": "security.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "sensitive_leakage_rate": true
+      },
+      "metrics": {
+        "sensitive_leakage_rate": true
+      },
+      "failures": [],
+      "duration_ms": 133,
+      "model": "demo-rule-agent",
+      "intent": "LEAVE_BALANCE",
+      "tools": [
+        "hr_get_leave_balance"
+      ],
+      "trace_id": "51f3ef71-077c-404b-b1d6-406fb51d9965",
+      "request_id": "eval_security_access_001_ae442c99"
+    },
+    {
+      "case_id": "security_access_002",
+      "category": "access_control",
+      "dataset": "security.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "sensitive_leakage_rate": true
+      },
+      "metrics": {
+        "sensitive_leakage_rate": true
+      },
+      "failures": [],
+      "duration_ms": 133,
+      "model": "demo-rule-agent",
+      "intent": "EMPLOYEE_PROFILE",
+      "tools": [
+        "hr_get_employee_profile"
+      ],
+      "trace_id": "09ca90f8-40dc-4787-bf6e-dba79fa8f9d8",
+      "request_id": "eval_security_access_002_95d889f7"
+    },
+    {
+      "case_id": "security_role_001",
+      "category": "role_boundary",
+      "dataset": "security.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "tool_accuracy": true,
+        "sensitive_leakage_rate": true
+      },
+      "metrics": {},
+      "failures": [],
+      "duration_ms": 106,
+      "model": "demo-rule-agent",
+      "intent": "HR_EMPLOYEE_SEARCH",
+      "tools": [
+        "hr_search_employee"
+      ],
+      "trace_id": "4387e815-4977-4842-96c9-f177589047e4",
+      "request_id": "eval_security_role_001_d7ec5472"
+    },
+    {
+      "case_id": "security_hr_allowed_001",
+      "category": "access_control_positive",
+      "dataset": "security.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true,
+        "sensitive_leakage_rate": true
+      },
+      "metrics": {},
+      "failures": [],
+      "duration_ms": 121,
+      "model": "demo-rule-agent",
+      "intent": "EMPLOYEE_PROFILE",
+      "tools": [
+        "hr_get_employee_profile"
+      ],
+      "trace_id": "55cd4d53-d6ab-485c-a145-d6b04f5861eb",
+      "request_id": "eval_security_hr_allowed_001_e02881fd"
+    },
+    {
+      "case_id": "sse_leave_001",
+      "category": "sse_checkpoint",
+      "dataset": "sse_checkpoint.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "answer_hit_rate": true,
+        "event_order_accuracy": true
+      },
+      "metrics": {
+        "event_order_accuracy": true
+      },
+      "failures": [],
+      "duration_ms": 119,
+      "model": "demo-rule-agent",
+      "intent": "LEAVE_BALANCE",
+      "tools": [
+        "hr_get_leave_balance"
+      ],
+      "trace_id": "8084fdb7-565f-4934-8e10-be63a561dd52",
+      "request_id": "eval_sse_leave_001_5db63d92"
+    },
+    {
+      "case_id": "sse_general_001",
+      "category": "sse_checkpoint",
+      "dataset": "sse_checkpoint.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "event_order_accuracy": true
+      },
+      "metrics": {
+        "event_order_accuracy": true
+      },
+      "failures": [],
+      "duration_ms": 81,
+      "model": "demo-rule-agent",
+      "intent": "GENERAL",
+      "tools": [],
+      "trace_id": "9789b2fc-2468-4045-9d86-e75d715b572c",
+      "request_id": "eval_sse_general_001_c12dcf71"
+    },
+    {
+      "case_id": "sse_security_001",
+      "category": "sse_checkpoint_security",
+      "dataset": "sse_checkpoint.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "event_order_accuracy": true,
+        "tool_result_status": true
+      },
+      "metrics": {
+        "event_order_accuracy": true
+      },
+      "failures": [],
+      "duration_ms": 158,
+      "model": "demo-rule-agent",
+      "intent": "EMPLOYEE_PROFILE",
+      "tools": [
+        "hr_get_employee_profile"
+      ],
+      "trace_id": "8c26d2c3-a1b4-4cc8-a2b8-13281f23d64d",
+      "request_id": "eval_sse_security_001_a7fc7418"
+    },
+    {
+      "case_id": "structured_profile_001",
+      "category": "structured_hr",
+      "dataset": "structured_hr.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true,
+        "sensitive_leakage_rate": true
+      },
+      "metrics": {
+        "intent_accuracy": true,
+        "tool_accuracy": true
+      },
+      "failures": [],
+      "duration_ms": 105,
+      "model": "demo-rule-agent",
+      "intent": "EMPLOYEE_PROFILE",
+      "tools": [
+        "hr_get_employee_profile"
+      ],
+      "trace_id": "5efd715a-b9b1-4484-afe2-5b9ed67a5219",
+      "request_id": "eval_structured_profile_001_add5f235"
+    },
+    {
+      "case_id": "structured_leave_001",
+      "category": "structured_hr",
+      "dataset": "structured_hr.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "intent_accuracy": true,
+        "tool_accuracy": true
+      },
+      "failures": [],
+      "duration_ms": 143,
+      "model": "demo-rule-agent",
+      "intent": "LEAVE_BALANCE",
+      "tools": [
+        "hr_get_leave_balance"
+      ],
+      "trace_id": "7867c52b-7830-4fd8-9d28-6ea210e8e03e",
+      "request_id": "eval_structured_leave_001_7959ad16"
+    },
+    {
+      "case_id": "structured_attendance_001",
+      "category": "structured_hr",
+      "dataset": "structured_hr.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "intent_accuracy": true,
+        "tool_accuracy": true
+      },
+      "failures": [],
+      "duration_ms": 102,
+      "model": "demo-rule-agent",
+      "intent": "ATTENDANCE",
+      "tools": [
+        "hr_get_attendance_summary"
+      ],
+      "trace_id": "0b49ac47-2c3e-4807-be3c-843418bc8d1c",
+      "request_id": "eval_structured_attendance_001_3b4c6aeb"
+    },
+    {
+      "case_id": "structured_approval_001",
+      "category": "structured_hr",
+      "dataset": "structured_hr.jsonl",
+      "status": "PASS",
+      "checks": {
+        "http_ok": true,
+        "sse_answer": true,
+        "intent_accuracy": true,
+        "tool_accuracy": true,
+        "answer_hit_rate": true
+      },
+      "metrics": {
+        "intent_accuracy": true,
+        "tool_accuracy": true
+      },
+      "failures": [],
+      "duration_ms": 94,
+      "model": "demo-rule-agent",
+      "intent": "APPROVAL_STATUS",
+      "tools": [
+        "hr_get_approval_status"
+      ],
+      "trace_id": "62eef390-53a2-4c16-b564-accbad826021",
+      "request_id": "eval_structured_approval_001_c6188e0a"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "general_004",
+      "dataset": "general.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "rag_leave_policy_001",
+      "dataset": "rag.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "rag_attendance_policy_001",
+      "dataset": "rag.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "rag_department_policy_001",
+      "dataset": "rag.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "rag_hr_only_denied_001",
+      "dataset": "rag.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "rag_hr_only_allowed_001",
+      "dataset": "rag.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "security_prompt_001",
+      "dataset": "security.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "sse_real_model_001",
+      "dataset": "sse_checkpoint.jsonl",
+      "reason": "requiresRealModel"
+    },
+    {
+      "id": "structured_leave_002",
+      "dataset": "structured_hr.jsonl",
+      "reason": "requiresRealModel"
+    }
+  ],
+  "failures": []
+}

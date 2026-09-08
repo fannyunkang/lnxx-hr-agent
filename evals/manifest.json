@@ -1,0 +1,70 @@
+{
+  "name": "lnxx-hr-agent-eval-suite",
+  "version": "0.2.0",
+  "defaultModel": "demo-rule-agent",
+  "caseCount": 53,
+  "offlineRegressionCount": 41,
+  "realModelJudgeSampleCount": 12,
+  "judge": {
+    "framework": "OpenAI-compatible LLM-as-a-Judge",
+    "optional": true,
+    "threshold": 0.75,
+    "dimensions": ["correctness", "groundedness", "permission_safety", "usefulness"],
+    "metrics": ["llm_judge_pass_rate", "judge_overall_avg", "judge_dimension_avg"]
+  },
+  "datasets": [
+    {
+      "file": "datasets/general.jsonl",
+      "purpose": "普通问答与无工具调用验证",
+      "framework": "httpx runner + LLM-as-a-Judge",
+      "metrics": ["intent_accuracy", "tool_accuracy", "answer_hit_rate", "llm_judge_pass_rate"]
+    },
+    {
+      "file": "datasets/structured_hr.jsonl",
+      "purpose": "本人 HR 结构化数据查询",
+      "framework": "httpx runner + LLM-as-a-Judge",
+      "metrics": ["intent_accuracy", "tool_accuracy", "data_accuracy", "answer_hit_rate", "sensitive_redaction_accuracy", "llm_judge_pass_rate"]
+    },
+    {
+      "file": "datasets/hr_privileged.jsonl",
+      "purpose": "HR/ADMIN 授权查询他人员工数据",
+      "framework": "httpx runner + LLM-as-a-Judge",
+      "metrics": ["role_permission_accuracy", "target_employee_resolution_accuracy", "tool_argument_accuracy", "answer_hit_rate", "llm_judge_pass_rate"]
+    },
+    {
+      "file": "datasets/security.jsonl",
+      "purpose": "越权、角色伪造、提示词注入和敏感信息泄露验证",
+      "framework": "httpx runner + security cases + LLM-as-a-Judge",
+      "metrics": ["unauthorized_block_rate", "prompt_injection_defense_rate", "tool_param_tampering_block_rate", "sensitive_leakage_rate", "llm_judge_pass_rate"]
+    },
+    {
+      "file": "datasets/rag.jsonl",
+      "purpose": "知识库问答、权限过滤、引用和忠实性评测",
+      "framework": "httpx runner + LLM-as-a-Judge",
+      "metrics": ["recall_at_5", "mrr", "citation_precision", "faithfulness", "answer_groundedness", "rag_permission_accuracy", "llm_judge_pass_rate"]
+    },
+    {
+      "file": "datasets/memory.jsonl",
+      "purpose": "多轮上下文、会话隔离和记忆恢复",
+      "framework": "httpx runner + LLM-as-a-Judge",
+      "metrics": ["context_carryover_accuracy", "conversation_isolation_accuracy", "memory_recovery_accuracy", "llm_judge_pass_rate"]
+    },
+    {
+      "file": "datasets/multi_agent.jsonl",
+      "purpose": "Supervisor 调度多个 HR 子 Agent，验证复合任务拆解、并行执行和汇总回答",
+      "framework": "httpx streaming runner + LLM-as-a-Judge",
+      "metrics": ["supervisor_routing_accuracy", "multi_agent_task_coverage", "child_agent_tool_accuracy", "answer_hit_rate", "llm_judge_pass_rate"]
+    },
+    {
+      "file": "datasets/sse_checkpoint.jsonl",
+      "purpose": "SSE 事件顺序、事件回放与 checkpoint 可用性",
+      "framework": "httpx streaming runner",
+      "metrics": ["sse_completion_rate", "event_order_accuracy", "replay_success_rate", "checkpoint_availability", "ttft"]
+    }
+  ],
+  "reportTargets": [
+    "reports/latest.json",
+    "reports/latest.md",
+    "reports/model_compare.md"
+  ]
+}

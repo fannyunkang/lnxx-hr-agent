@@ -1,0 +1,117 @@
+openapi: 3.1.0
+info:
+  title: LNXX Backend-Agent Internal Contract
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /internal/v1/agent/runs:
+    post:
+      operationId: runAgent
+      security: [{ serviceToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AgentRunRequest' }
+      responses:
+        '200':
+          description: Agent result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AgentRunResponse' }
+  /internal/v1/agent/runs/stream:
+    post:
+      operationId: streamAgent
+      security: [{ serviceToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AgentRunRequest' }
+      responses:
+        '200':
+          description: status, route, tool, answer, done or error SSE events
+          content:
+            text/event-stream:
+              schema: { type: string }
+  /internal/v1/tools/{toolName}:
+    post:
+      operationId: executeHrTool
+      security: [{ serviceToken: [] }]
+      parameters:
+        - name: toolName
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [employee_profile, attendance_summary, leave_balance, approval_status, knowledge_search]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ToolRequest' }
+      responses:
+        '200':
+          description: Structured tool result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ToolResponse' }
+components:
+  securitySchemes:
+    serviceToken:
+      type: apiKey
+      in: header
+      name: X-Agent-Service-Token
+  schemas:
+    UserContext:
+      type: object
+      additionalProperties: false
+      required: [username, employeeId, role, department]
+      properties:
+        username: { type: string, minLength: 1, maxLength: 64 }
+        employeeId: { type: string, pattern: '^[A-Za-z0-9_-]{2,32}$' }
+        role: { type: string, enum: [EMPLOYEE, HR, ADMIN] }
+        department: { type: string, maxLength: 64 }
+    AgentRunRequest:
+      type: object
+      additionalProperties: false
+      required: [requestId, conversationId, message, userContext]
+      properties:
+        requestId: { type: string, minLength: 8, maxLength: 64 }
+        conversationId: { type: string, minLength: 8, maxLength: 64 }
+        message: { type: string, minLength: 1, maxLength: 500 }
+        userContext: { $ref: '#/components/schemas/UserContext' }
+    AgentRunResponse:
+      type: object
+      additionalProperties: false
+      required: [requestId, conversationId, traceId, answer, intent, tools, citations, model, status]
+      properties:
+        requestId: { type: string }
+        conversationId: { type: string }
+        traceId: { type: string }
+        answer: { type: string }
+        intent: { type: string }
+        tools: { type: array, items: { type: string } }
+        citations: { type: array, items: { type: string } }
+        model: { type: string }
+        status: { type: string, enum: [COMPLETED, FAILED, INTERRUPTED] }
+    ToolRequest:
+      type: object
+      additionalProperties: false
+      required: [requestId, userContext, arguments]
+      properties:
+        requestId: { type: string }
+        userContext: { $ref: '#/components/schemas/UserContext' }
+        arguments: { type: object, additionalProperties: true }
+    ToolResponse:
+      type: object
+      additionalProperties: false
+      required: [tool, success]
+      properties:
+        tool: { type: string }
+        success: { type: boolean }
+        data: {}
+        error:
+          type: [object, 'null']
+          additionalProperties: true
