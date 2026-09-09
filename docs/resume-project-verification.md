@@ -74,7 +74,7 @@ status -> route -> supervisor_plan -> agent_start -> status -> tool_start -> too
 .\scripts\run-agent-eval.ps1 -IncludeRealModels -Judge
 ```
 
-裁判模型按 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度输出 0-1 分，默认 `overall >= 0.75` 判为通过；报告会额外生成 `LLM Judge Pass Rate`、`LLM Judge Overall Avg`、四维均分和失败诊断。简历中的“系统忠实度 71% 提升到 85%，上下文精确、召回 > 90%”对应 `faithfulness`、`context_precision`、`context_recall` 与 `judge.dimensionAvg.groundedness` 等报告字段。
+裁判模型按 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度输出 0-1 分，默认 `overall >= 0.75` 判为通过；报告会额外生成 `LLM Judge Pass Rate`、`LLM Judge Overall Avg`、四维均分、`overallAccuracy` 综合准确率、失败诊断和 `evals/reports/dashboard.html` 可视化看板。`overallAccuracy` 使用所有 `*_accuracy` 检查的 micro-average，即 `通过的准确性检查数 / 全部准确性检查数`，不是多个百分比的简单平均。简历中的“系统忠实度 71% 提升到 85%，上下文精确、召回 > 90%”对应 `faithfulness`、`context_precision`、`context_recall` 与 `judge.dimensionAvg.groundedness` 等报告字段。
 
 ## 与简历一致的表述
 

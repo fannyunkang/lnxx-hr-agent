@@ -18,7 +18,7 @@
 - `datasets/generated_700/`：由 `generators/build_700_case_suite.py` 生成的 700 条完整评测集；配额为普通对话 70、本人 HR 查询 140、HR 授权查询 105、权限越权 140、RAG 105、多轮记忆 70、多 Agent 50、SSE/checkpoint 20。
 - `generators/build_700_case_suite.py`：基于人工业务骨架、真实 HR 问法模板和确定性变体生成规模化 JSONL。
 - `runners/run_agent_eval.py`：自动执行评测并生成报告。
-- `reports/latest.json` / `reports/latest.md`：最近一次评测报告。
+- `reports/latest.json` / `reports/latest.md` / `reports/dashboard.html`：最近一次评测报告和可视化指标看板。
 - LLM-as-a-Judge：可选裁判模型评测层，基于 OpenAI-compatible `/chat/completions` 对回答质量打分。
 
 ## 通用字段
@@ -62,12 +62,25 @@
 - `llm_judge_pass_rate`：裁判模型 `overall` 分数是否达到阈值，默认阈值为 `0.75`。
 - `judge_overall_avg`：裁判模型对已评测 case 的平均总分。
 - `judge_dimension_avg`：裁判模型在 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度的平均分。
+- `overallAccuracy`：综合准确率，按所有 `*_accuracy` 类检查做 micro-average，公式为 `通过的准确性检查数 / 全部准确性检查数`，覆盖意图、工具、权限、引用、子 Agent、会话隔离和 Trace 完整性。
 
 ## LLM-as-a-Judge
 
 评测 runner 保留确定性规则指标，同时支持裁判模型从 `correctness`、`groundedness`、`permission_safety`、`usefulness` 四个维度输出 0-1 分、总分和一句评语。报告会汇总规则通过率、各数据集通过率、`judge_pass_rate`、`overall_avg` 和四维均分。裁判模型只读取测试问题、期望工具/意图、禁止泄露片段、实际回答、工具、引用、Trace ID 和关键 SSE 事件等评测上下文，不影响 Agent 本身执行链路。
 
 `faithfulness`、`context_precision`、`context_recall` 同时由规则指标和 Judge 质量分支支撑：规则层负责可定位的硬约束，Judge 层负责自然语言答案是否忠实、完整、有用的软评分。简历中的“系统忠实度 71% 提升到 85%，上下文精确、召回 > 90%”对应 `reports/latest.json` 中的 `faithfulness`、`context_precision`、`context_recall` 和 `judge.dimensionAvg.groundedness` 等字段。
+
+## 可视化与综合准确率
+
+每次 runner 写出报告时会同步生成 `reports/dashboard.html`，包含核心分数卡、指标条形图、按数据集/类别通过率、Judge 四维均分和失败诊断表。
+
+综合准确率不是把 `intent_accuracy`、`tool_accuracy` 等百分比做简单平均，而是对所有准确性检查做 micro-average。例如 700 条 case 里一共产生 2,100 个准确性检查，通过 1,995 个，则：
+
+```text
+overallAccuracy = 1995 / 2100 = 95.00%
+```
+
+这种方式能让多轮、多 Agent、权限和引用类检查都按真实检查次数计入最终准确率。
 
 配置裁判模型：
 

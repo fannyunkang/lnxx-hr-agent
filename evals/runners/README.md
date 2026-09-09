@@ -33,3 +33,4 @@ cd G:\ProjectinSummer\lnxx-hr-agent
 
 - `evals/reports/latest.json`
 - `evals/reports/latest.md`
+- `evals/reports/dashboard.html`

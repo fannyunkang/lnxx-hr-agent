@@ -6,6 +6,7 @@ import json
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from html import escape
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -17,6 +18,21 @@ ROOT = Path(__file__).resolve().parents[1]
 DATASETS = ROOT / "datasets"
 GENERATED_700 = DATASETS / "generated_700"
 REPORTS = ROOT / "reports"
+
+ACCURACY_METRIC_NAMES = {
+    "intent_accuracy",
+    "tool_accuracy",
+    "child_agent_tool_accuracy",
+    "supervisor_routing_accuracy",
+    "permission_decision_accuracy",
+    "citation_accuracy",
+    "role_permission_accuracy",
+    "target_employee_resolution_accuracy",
+    "tool_argument_accuracy",
+    "conversation_isolation_accuracy",
+    "authorization_trace_integrity",
+    "traceability_accuracy",
+}
 
 
 @dataclass
@@ -829,6 +845,17 @@ def summarize(results: list[CaseResult], skipped: list[dict[str, Any]]) -> dict[
         for name in judged_dimension_scores:
             if isinstance(scores.get(name), int | float):
                 judged_dimension_scores[name].append(float(scores[name]))
+    metrics = {
+        name: safe_rate(sum(values), len(values))
+        for name, values in sorted(metric_values.items())
+    }
+    accuracy_values = [
+        value
+        for name, values in metric_values.items()
+        if base_metric_name(name) in ACCURACY_METRIC_NAMES or base_metric_name(name).endswith("_accuracy")
+        for value in values
+    ]
+    context_quality_names = ("faithfulness", "context_precision", "context_recall")
     return {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "total": len(results) + len(skipped),
@@ -837,9 +864,18 @@ def summarize(results: list[CaseResult], skipped: list[dict[str, Any]]) -> dict[
         "passed": sum(result.status == "PASS" for result in results),
         "failed": sum(result.status == "FAIL" for result in results),
         "passRate": safe_rate(sum(result.status == "PASS" for result in results), len(results)),
-        "metrics": {
-            name: safe_rate(sum(values), len(values))
-            for name, values in sorted(metric_values.items())
+        "metrics": metrics,
+        "composite": {
+            "overallAccuracy": safe_rate(sum(accuracy_values), len(accuracy_values)),
+            "accuracyChecks": len(accuracy_values),
+            "contextQualityAvg": round(
+                sum(metrics[name] for name in context_quality_names if name in metrics)
+                / len([name for name in context_quality_names if name in metrics]),
+                4,
+            )
+            if any(name in metrics for name in context_quality_names)
+            else 0.0,
+            "formula": "overallAccuracy = passed *_accuracy checks / all *_accuracy checks",
         },
         "judge": {
             "executed": len(judged_scores),
@@ -856,6 +892,13 @@ def summarize(results: list[CaseResult], skipped: list[dict[str, Any]]) -> dict[
         "byCategory": summarize_by(results, "category"),
         "byDataset": summarize_by(results, "dataset"),
     }
+
+
+def base_metric_name(name: str) -> str:
+    parts = name.split("_")
+    if len(parts) >= 3 and parts[0] == "turn" and parts[1].isdigit():
+        return "_".join(parts[2:])
+    return name
 
 
 def summarize_by(results: list[CaseResult], field_name: str) -> dict[str, Any]:
@@ -906,6 +949,7 @@ def write_reports(summary: dict[str, Any], results: list[CaseResult], skipped: l
     }
     (REPORTS / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     (REPORTS / "latest.md").write_text(render_markdown(payload), encoding="utf-8")
+    (REPORTS / "dashboard.html").write_text(render_dashboard(payload), encoding="utf-8")
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
@@ -920,9 +964,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Passed: {summary['passed']}",
         f"- Failed: {summary['failed']}",
         f"- Pass Rate: {summary['passRate']:.2%}",
+        f"- Overall Accuracy: {summary['composite']['overallAccuracy']:.2%}",
+        f"- Context Quality Avg: {summary['composite']['contextQualityAvg']:.2%}",
+        f"- Accuracy Checks: {summary['composite']['accuracyChecks']}",
         f"- LLM Judge Executed: {summary['judge']['executed']}",
         f"- LLM Judge Pass Rate: {summary['judge']['passRate']:.2%}",
         f"- LLM Judge Overall Avg: {summary['judge']['overallAvg']:.2%}",
+        f"- Composite Formula: `{summary['composite']['formula']}`",
         "",
         "## LLM Judge Dimension Avg",
         "",
@@ -974,6 +1022,124 @@ def render_markdown(payload: dict[str, Any]) -> str:
             )
     lines.append("")
     return "\n".join(lines)
+
+
+def render_dashboard(payload: dict[str, Any]) -> str:
+    summary = payload["summary"]
+    key_scores = {
+        "Pass Rate": summary["passRate"],
+        "Overall Accuracy": summary["composite"]["overallAccuracy"],
+        "Context Quality": summary["composite"]["contextQualityAvg"],
+        "Judge Pass Rate": summary["judge"]["passRate"],
+        "Judge Overall": summary["judge"]["overallAvg"],
+    }
+    metrics = dict(sorted(summary["metrics"].items(), key=lambda item: item[0]))
+    metric_bars = "\n".join(bar_row(name, value) for name, value in metrics.items())
+    dataset_bars = "\n".join(
+        bar_row(name, item["passRate"], f"{item['passed']}/{item['total']}")
+        for name, item in summary["byDataset"].items()
+    )
+    category_bars = "\n".join(
+        bar_row(name, item["passRate"], f"{item['passed']}/{item['total']}")
+        for name, item in summary["byCategory"].items()
+    )
+    judge_bars = "\n".join(
+        bar_row(name, value)
+        for name, value in summary["judge"].get("dimensionAvg", {}).items()
+    )
+    key_cards = "\n".join(
+        f"""
+        <article class="score-card">
+          <span>{escape(name)}</span>
+          <strong>{value:.2%}</strong>
+          <div class="track"><div style="width:{value * 100:.2f}%"></div></div>
+        </article>
+        """
+        for name, value in key_scores.items()
+    )
+    failures = payload["failures"]
+    failure_rows = (
+        "\n".join(
+            f"""
+            <tr>
+              <td>{escape(item['id'])}</td>
+              <td>{escape(item['dataset'])}</td>
+              <td>{escape(item['diagnosis'])}</td>
+              <td>{escape('; '.join(item['failures'])[:220])}</td>
+            </tr>
+            """
+            for item in failures[:50]
+        )
+        if failures
+        else "<tr><td colspan=\"4\">No failures.</td></tr>"
+    )
+    return f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HR Agent Eval Dashboard</title>
+  <style>
+    body {{ margin:0; font-family: Arial, "Microsoft YaHei", sans-serif; color:#18231f; background:#f5f7f6; }}
+    header {{ padding:28px 32px; background:#0f3d35; color:white; }}
+    h1 {{ margin:0 0 8px; font-size:24px; letter-spacing:0; }}
+    h2 {{ margin:0 0 14px; font-size:16px; }}
+    p {{ margin:0; color:#d8e8e2; }}
+    main {{ max-width:1180px; margin:0 auto; padding:24px; display:grid; gap:18px; }}
+    section {{ background:white; border:1px solid #dde7e3; border-radius:8px; padding:18px; }}
+    .score-grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }}
+    .score-card {{ border:1px solid #dfe9e5; border-radius:8px; padding:14px; background:#fbfcfc; }}
+    .score-card span {{ display:block; color:#5f6f69; font-size:12px; }}
+    .score-card strong {{ display:block; margin:8px 0; font-size:24px; }}
+    .track {{ height:8px; background:#e7eeeb; border-radius:999px; overflow:hidden; }}
+    .track div {{ height:100%; background:#1f8f6f; }}
+    .bar-row {{ display:grid; grid-template-columns:minmax(190px, 280px) 1fr 70px; gap:12px; align-items:center; margin:9px 0; font-size:13px; }}
+    .bar-name {{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }}
+    .bar-value {{ text-align:right; color:#47564f; font-variant-numeric:tabular-nums; }}
+    table {{ width:100%; border-collapse:collapse; font-size:13px; }}
+    th,td {{ padding:10px; border-bottom:1px solid #e3ebe7; text-align:left; vertical-align:top; }}
+    th {{ color:#53635d; background:#f6f9f8; }}
+    code {{ background:#edf3f1; padding:2px 5px; border-radius:4px; }}
+    @media (max-width: 720px) {{
+      header {{ padding:22px 18px; }}
+      main {{ padding:14px; }}
+      .bar-row {{ grid-template-columns:1fr 56px; }}
+      .bar-row .track {{ grid-column:1 / -1; grid-row:2; }}
+    }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HR Agent Eval Dashboard</h1>
+    <p>Generated at <code>{escape(summary['generatedAt'])}</code>, executed {summary['executed']} of {summary['total']} cases.</p>
+  </header>
+  <main>
+    <section><h2>Core Scores</h2><div class="score-grid">{key_cards}</div></section>
+    <section><h2>Metrics</h2>{metric_bars}</section>
+    <section><h2>By Dataset</h2>{dataset_bars}</section>
+    <section><h2>By Category</h2>{category_bars}</section>
+    <section><h2>Judge Dimensions</h2>{judge_bars or '<p>No judge scores recorded.</p>'}</section>
+    <section>
+      <h2>Failures</h2>
+      <table>
+        <thead><tr><th>Case</th><th>Dataset</th><th>Diagnosis</th><th>Failure</th></tr></thead>
+        <tbody>{failure_rows}</tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
+"""
+
+
+def bar_row(name: str, value: float, detail: str | None = None) -> str:
+    return f"""
+    <div class="bar-row">
+      <div class="bar-name" title="{escape(name)}">{escape(name)}</div>
+      <div class="track"><div style="width:{value * 100:.2f}%"></div></div>
+      <div class="bar-value">{escape(detail) if detail else f"{value:.2%}"}</div>
+    </div>
+    """
 
 
 def diagnose_failure(result: CaseResult) -> str:

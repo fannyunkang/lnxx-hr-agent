@@ -88,6 +88,7 @@
   "reportTargets": [
     "reports/latest.json",
     "reports/latest.md",
+    "reports/dashboard.html",
     "reports/model_compare.md"
   ]
 }
