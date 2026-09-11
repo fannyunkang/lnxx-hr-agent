@@ -19,7 +19,13 @@ $env:MILVUS_INITIALIZE_SCHEMA="true"
 docker compose up -d --build
 ```
 
-访问 `http://localhost:5173`。演示账号：员工 `employee / employee123`，HR `hr / hr123456`。首次构建 PaddleOCR 镜像会下载较大的运行依赖。
+也可以直接使用脚本入口：
+
+```powershell
+.\scripts\start-all.ps1
+```
+
+访问 `http://localhost:5173`。演示账号：员工 `employee / employee123`、员工 `employee2 / employee234`、HR `hr / hr123456`、管理员 `admin / admin123456`。首次构建 PaddleOCR 镜像会下载较大的运行依赖。
 
 检查状态：
 
@@ -51,6 +57,18 @@ npm run dev
 ```
 
 本地脚本使用 Python Agent 链路：先运行 `.\scripts\start-agent.ps1`，再运行 `.\scripts\start-backend-python-agent.ps1`。Docker Compose 已默认设置 `AGENT_RUNTIME=python`。如需验证 Java Spring AI 运行时，可显式设置 `AGENT_RUNTIME=spring-ai`。
+
+如果想一键进入本地开发模式，可以运行：
+
+```powershell
+.\scripts\start-all.ps1 -Mode local
+```
+
+该脚本会用 Docker Compose 启动 MySQL、Redis、Milvus、OCR 和 MCP Server，再在后台启动 Python Agent、Spring Backend、Vue 前端；日志写入 `.run/logs`，PID 写入 `.run/pids`。停止本地后台进程：
+
+```powershell
+.\scripts\stop-all.ps1
+```
 
 Python Agent 现在负责显式 `model → tools → model` 循环、意图路由事件、Redis 会话窗口、节点级 Trace、重复调用检测、每轮/总工具限额和模型有限重试。内部 Trace 可通过 `GET /internal/v1/agent/traces/{traceId}` 查询，Prometheus 指标位于 Python 服务 `/metrics`。
 

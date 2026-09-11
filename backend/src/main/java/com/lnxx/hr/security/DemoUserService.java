@@ -9,7 +9,9 @@ import java.util.Optional;
 public class DemoUserService {
     private final Map<String, DemoUser> users = Map.of(
             "employee", new DemoUser("employee", "employee123", "E1001", "张伟", UserRole.EMPLOYEE),
-            "hr", new DemoUser("hr", "hr123456", "E9001", "李娜", UserRole.HR)
+            "employee2", new DemoUser("employee2", "employee234", "E1002", "王敏", UserRole.EMPLOYEE),
+            "hr", new DemoUser("hr", "hr123456", "E9001", "李娜", UserRole.HR),
+            "admin", new DemoUser("admin", "admin123456", "E9002", "赵强", UserRole.ADMIN)
     );
 
     public Optional<DemoUser> authenticate(String username, String password) {
@@ -20,4 +22,3 @@ public class DemoUserService {
         return Optional.ofNullable(users.get(username));
     }
 }
-

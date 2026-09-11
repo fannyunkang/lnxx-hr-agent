@@ -5,6 +5,7 @@
 .env
 scripts/model-api.local.ps1
 .tools/
+.run/
 agent-service/.venv/
 agent-service/.pytest_cache/
 agent-service/.ruff_cache/

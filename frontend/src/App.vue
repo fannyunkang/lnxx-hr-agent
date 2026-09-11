@@ -179,7 +179,7 @@ const scopeText = (scope: KnowledgeChunk['scope']) => ({
         <label>密码<input v-model="password" type="password" autocomplete="current-password" /></label>
         <p v-if="loginError" class="error">{{ loginError }}</p>
         <button class="primary" :disabled="loginBusy">{{ loginBusy ? '正在验证...' : '进入 Agent' }}</button>
-        <p class="demo-tip">演示员工：employee / employee123<br>演示 HR：hr / hr123456</p>
+        <p class="demo-tip">演示员工：employee / employee123<br>员工二：employee2 / employee234<br>演示 HR：hr / hr123456<br>管理员：admin / admin123456</p>
       </form>
     </section>
   </main>
